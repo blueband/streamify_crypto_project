@@ -121,15 +121,3 @@ variable "other_copmonents" {
 variable "contents_destroy_on_delete" {
   type = bool
 }
-
-variable "stg_bq_dataset" {
-  type = string
-}
-
-variable "prod_bq_dataset" {
-  type = string
-}
-
-variable "network" {
-  type = string
-}
