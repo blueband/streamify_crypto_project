@@ -24,10 +24,6 @@ variable "os_image" {
   type        = string
 }
 
-variable "network" {
-  description = "Network for your instance/cluster"
-  type        = string
-}
 
 variable "stg_bq_dataset" {
   description = "Storage class type for your bucket. Check official docs for more info."
@@ -122,14 +118,15 @@ variable "contents_destroy_on_delete" {
   type = bool
 }
 
-variable "stg_bq_dataset" {
+variable "wkstation_machine_type" {
   type = string
 }
 
-variable "prod_bq_dataset" {
+variable "project_network" {
   type = string
+
 }
 
-variable "network" {
-  type = string
+variable "wkstation_boot_disk_size_gb" {
+  type = number
 }

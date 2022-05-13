@@ -31,7 +31,7 @@ jobs:
     - name: Login to GCP
       uses: google-github-actions/auth@v0
       with:
-        credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+        credentials_json: ${{ secrets.CREDENTIALS_JSON}}
         project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
@@ -69,7 +69,7 @@ jobs:
     - name: Login to GCP
       uses: google-github-actions/auth@v0
       with:
-        credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+        credentials_json: ${{ secrets.CREDENTIALS_JSON }}
         project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
 
       # On push to main, build or change infrastructure according to Terraform configuration files
@@ -103,7 +103,7 @@ jobs:
       - name: Login to GCP
         uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
           project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
       
 
@@ -118,5 +118,6 @@ jobs:
       - name: Metadata configuration
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          gcloud compute instances add-metadata workstation-4-development --zone us-east1-b --metadata-from-file startup-script=idle-shutdown.sh
+          gcloud compute instances add-metadata var.kafka_name --zone us-east1-b --metadata-from-file startup-script=idle-shutdown.sh
+          gcloud compute instances add-metadata var.airflow_name --zone us-east1-b --metadata-from-file startup-script=idle-shutdown.sh
         # gcloud compute instances add-metadata workstation-4-development --metadata-from-file ssh-keys=${{secrets.SECRET_KEY_SSH}}

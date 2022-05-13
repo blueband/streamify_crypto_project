@@ -7,7 +7,7 @@ variable "bucket_name" {
 
 }
 
-variable "var.dataproc_region" {
+variable "dataproc_region" {
   type = string
 
 }
@@ -55,4 +55,8 @@ variable "worker_image_version" {
 variable "other_copmonents" {
   type = list(any)
 
+}
+
+variable "dataproc_network" {
+  type = string
 }

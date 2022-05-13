@@ -7,7 +7,7 @@ resource "google_dataproc_cluster" "mulitnode_spark_cluster" {
     staging_bucket = var.bucket_name
 
     gce_cluster_config {
-      network = var.network
+      network = var.dataproc_network
       zone    = var.data_proc_zone
 
       shielded_instance_config {

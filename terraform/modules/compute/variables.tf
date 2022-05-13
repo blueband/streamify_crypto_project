@@ -20,7 +20,7 @@ variable "wkstation_boot_disk_size_gb" {
   type = number
 }
 
-variable "network" {
+variable "compute_network" {
   type = string
 
 }
