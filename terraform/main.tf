@@ -1,6 +1,6 @@
 module "firewall" {
   source            = "./modules/firewall"
-  project           = var.project
+  project           = var.projectid
   kafka_port_name   = var.kafka_port_name
   network           = var.network
   firewall_protocol = var.firewall_protocol
@@ -53,7 +53,7 @@ module "bigquery" {
   source                     = "./modules/bigquery"
   stg_bq_dataset             = var.stg_bq_dataset
   prod_bq_dataset            = var.prod_bq_dataset
-  bq_project_id              = var.bq_project_id
+  bq_project_id              = var.projectid
   bq_region                  = var.project_region
   contents_destroy_on_delete = var.contents_destroy_on_delete
 }

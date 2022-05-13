@@ -2,12 +2,12 @@
 terraform {
   backend "gcs" {
     bucket = "tf-tfstatefile"
-    prefix = "terraform/state"
+    prefix = "terraform/streamify"
   }
 }
 
 provider "google" {
   project = var.projectid
-  region  = var.region
-  zone    = var.compute_zone
+  region  = var.project_region
+  zone    = var.project_zone
 }
