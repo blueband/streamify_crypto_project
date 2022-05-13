@@ -69,7 +69,7 @@ jobs:
     - name: Login to GCP
       uses: google-github-actions/auth@v0
       with:
-        credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+        credentials_json: ${{ secrets.CREDENTIALS_JSON }}
         project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
 
       # On push to main, build or change infrastructure according to Terraform configuration files
@@ -103,7 +103,7 @@ jobs:
       - name: Login to GCP
         uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
           project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
       
 
