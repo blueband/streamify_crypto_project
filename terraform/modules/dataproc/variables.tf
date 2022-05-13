@@ -7,7 +7,7 @@ variable "bucket_name" {
 
 }
 
-variable "var.dataproc_region" {
+variable "dataproc_region" {
   type = string
 
 }
