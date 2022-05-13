@@ -1,0 +1,122 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+
+permissions:
+  contents: read
+
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run: 
+        shell: bash
+        
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Login to GCP with service key
+    - name: Login to GCP
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.CREDENTIALS_JSON}}
+        project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: |
+        cd terraform      
+        terraform init
+    # `cd terraform` was add to fix directory where terraform is been run from
+
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: |
+        cd terraform
+        terraform fmt -check
+    # `cd terraform` was add to fix directory where terraform is been run from
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: |
+        cd terraform
+        terraform plan -var="projectid=${{ secrets.TF_PROJECTID }}"
+    # `cd terraform` was add to fix directory where terraform is been run from
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: Login to GCP
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+        project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
+
+      # On push to main, build or change infrastructure according to Terraform configuration files
+      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        cd terraform
+        terraform apply -auto-approve -var="projectid=${{ secrets.TF_PROJECTID }}"
+        
+  # `cd terraform` was add to fix directory where terraform is been run from
+  # https://stackoverflow.com/questions/58139175/running-actions-in-another-directory/63122434#63122434
+
+    
+  create_metadata:
+    name: Download Monitor Script create Metadata
+    needs: terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run: 
+        shell: bash
+
+    steps:
+      # Download Script
+      - name: Download Monitor Script
+        run: |
+          wget https://gist.githubusercontent.com/justinshenk/312b5e0ab7acc3b116f7bf3b6d888fa4/raw/59f021c2bf0388ba36e5a589dba52e233ee84964/idle-shutdown.sh
+
+
+      # Login to GCP with service key
+      - name: Login to GCP
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCS_TERRAFORM_GITHUB_SA }}
+          project_id: ${{ secrets.TF_PROJECTID }}    # Enabled for GCS backend
+      
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+      
+      # Upload script to GSC bucke
+      - name: Upload file to GSC bucket
+        run: |
+          gsutil cp idle-shutdown.sh gs://blueproject-scripts
+
+      - name: Metadata configuration
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          gcloud compute instances add-metadata workstation-4-development --zone us-east1-b --metadata-from-file startup-script=idle-shutdown.sh
+        # gcloud compute instances add-metadata workstation-4-development --metadata-from-file ssh-keys=${{secrets.SECRET_KEY_SSH}}
