@@ -3,15 +3,13 @@ variable "project" {
   type        = string
 }
 
-variable "region" {
+variable "project_region" {
   description = "Your project region"
-  default     = "us-central1"
   type        = string
 }
 
-variable "zone" {
+variable "project_zone" {
   description = "Your project zone"
-  default     = "us-central1-a"
   type        = string
 }
 
@@ -21,31 +19,117 @@ variable "storage_class" {
   type        = string
 }
 
-variable "vm_image" {
+variable "os_image" {
   description = "Image for you VM"
-  default     = "ubuntu-os-cloud/ubuntu-2004-lts"
   type        = string
 }
 
 variable "network" {
   description = "Network for your instance/cluster"
-  default     = "default"
   type        = string
 }
 
 variable "stg_bq_dataset" {
   description = "Storage class type for your bucket. Check official docs for more info."
-  default     = "streamify_stg"
   type        = string
 }
 
 variable "prod_bq_dataset" {
   description = "Storage class type for your bucket. Check official docs for more info."
-  default     = "streamify_prod"
   type        = string
 }
 
-variable "bucket" {
+variable "bucket_name" {
   description = "The name of your bucket. This should be unique across GCP"
   type        = string
+}
+
+variable "desired_status" {
+  type = string
+}
+
+variable "disk_type" {
+  type = string
+}
+
+variable "wk_stop_update_status" {
+  type = bool
+}
+
+variable "kafka_port_name" {
+  type = string
+}
+
+variable "firewall_protocol" {
+  type = string
+}
+
+variable "kafka_port_number" {
+  type = list(any)
+
+}
+
+variable "ip_range" {
+  type = string
+
+}
+
+variable "kafka_name" {
+  type = string
+}
+
+variable "airflow_name" {
+  type = string
+}
+
+variable "bucket_access" {
+  type = bool
+}
+
+variable "bucket_destroy_status" {
+  type = bool
+}
+
+variable "dataproc_name" {
+  type = string
+}
+
+variable "secure_boot" {
+  type = bool
+}
+
+variable "master_num_instance" {
+  type = string
+}
+
+variable "worker_num_instance" {
+  type = string
+}
+
+variable "worker_machine_type" {
+  type = string
+}
+
+variable "worker_image_version" {
+  type = string
+}
+
+variable "other_copmonents" {
+  type = list(any)
+}
+
+variable "contents_destroy_on_delete" {
+  type = bool
+}
+
+variable "stg_bq_dataset" {
+  type = string
+}
+
+variable "prod_bq_dataset" {
+  type = string
+}
+
+variable "network" {
+  type = string
 }
