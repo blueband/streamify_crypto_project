@@ -1,151 +1,59 @@
-terraform {
-  required_version = ">=1.0"
-  backend "local" {}
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-    }
-  }
-}
-
-provider "google" {
-  project = var.project
-  region  = var.region
-  zone    = var.zone
-  // credentials = file(var.credentials)  # Use this if you do not want to set env-var GOOGLE_APPLICATION_CREDENTIALS
-}
-
-
-resource "google_compute_firewall" "port_rules" {
-  project     = var.project
-  name        = "kafka-broker-port"
-  network     = var.network
-  description = "Opens port 9092 in the Kafka VM for Spark cluster to connect"
-
-  allow {
-    protocol = "tcp"
-    ports    = ["9092"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["kafka"]
+module "firewall" {
+  source            = "./modules/firewall"
+  project           = var.projectid
+  kafka_port_name   = var.kafka_port_name
+  network           = var.network
+  firewall_protocol = var.firewall_protocol
+  kafka_port_number = var.kafka_port_number
+  ip_range          = var.ip_range
 
 }
 
-resource "google_compute_instance" "kafka_vm_instance" {
-  name                      = "streamify-kafka-instance"
-  machine_type              = "e2-standard-4"
-  tags                      = ["kafka"]
-  allow_stopping_for_update = true
 
-  boot_disk {
-    initialize_params {
-      image = var.vm_image
-      size  = 30
-    }
-  }
-
-  network_interface {
-    network = var.network
-    access_config {
-    }
-  }
-}
-
-
-resource "google_compute_instance" "airflow_vm_instance" {
-  name                      = "streamify-airflow-instance"
-  machine_type              = "e2-standard-4"
-  allow_stopping_for_update = true
-
-  boot_disk {
-    initialize_params {
-      image = var.vm_image
-      size  = 30
-    }
-  }
-
-  network_interface {
-    network = var.network
-    access_config {
-    }
-  }
-}
-
-resource "google_storage_bucket" "bucket" {
-  name          = var.bucket
-  location      = var.region
-  force_destroy = true
-
-  uniform_bucket_level_access = true
-
-  lifecycle_rule {
-    action {
-      type = "Delete"
-    }
-    condition {
-      age = 30 # days
-    }
-  }
-}
-
-
-resource "google_dataproc_cluster" "mulitnode_spark_cluster" {
-  name   = "streamify-multinode-spark-cluster"
-  region = var.region
-
-  cluster_config {
-
-    staging_bucket = var.bucket
-
-    gce_cluster_config {
-      network = var.network
-      zone    = var.zone
-
-      shielded_instance_config {
-        enable_secure_boot = true
-      }
-    }
-
-    master_config {
-      num_instances = 1
-      machine_type  = "e2-standard-2"
-      disk_config {
-        boot_disk_type    = "pd-ssd"
-        boot_disk_size_gb = 30
-      }
-    }
-
-    worker_config {
-      num_instances = 2
-      machine_type  = "e2-medium"
-      disk_config {
-        boot_disk_size_gb = 30
-      }
-    }
-
-    software_config {
-      image_version = "2.0-debian10"
-      override_properties = {
-        "dataproc:dataproc.allow.zero.workers" = "true"
-      }
-      optional_components = ["JUPYTER"]
-    }
-
-  }
+module "compute" {
+  source                      = "./modules/compute"
+  kafka_name                  = var.kafka_name
+  airflow_name                = var.airflow_name
+  network                     = var.network
+  wkstation_machine_type      = var.wkstation_machine_type
+  wk_stop_update_status       = var.wk_stop_update_status
+  os_image                    = var.os_image
+  wkstation_boot_disk_size_gb = var.wkstation_boot_disk_size_gb
 
 }
 
-resource "google_bigquery_dataset" "stg_dataset" {
-  dataset_id                 = var.stg_bq_dataset
-  project                    = var.project
-  location                   = var.region
-  delete_contents_on_destroy = true
+module "storage" {
+  source                = "./modules/storage"
+  bucket_name           = var.bucket_name
+  bucket_region         = var.project_region
+  bucket_destroy_status = var.bucket_destroy_status
+  bucket_access         = var.bucket_access
 }
 
-resource "google_bigquery_dataset" "prod_dataset" {
-  dataset_id                 = var.prod_bq_dataset
-  project                    = var.project
-  location                   = var.region
-  delete_contents_on_destroy = true
+module "dataproc" {
+  source                      = "./modules/dataproc"
+  dataproc_name               = var.dataproc_name
+  dataproc_region             = var.project_region
+  bucket_name                 = var.bucket_name
+  network                     = var.network
+  data_proc_zone              = var.project_zone
+  secure_boot                 = var.secure_boot
+  master_num_instance         = var.master_num_instance
+  wkstation_machine_type      = var.wkstation_machine_type
+  disk_type                   = var.disk_type
+  wkstation_boot_disk_size_gb = var.wkstation_boot_disk_size_gb
+  worker_num_instance         = var.worker_num_instance
+  worker_machine_type         = var.worker_machine_type
+  worker_image_version        = var.worker_image_version
+  other_copmonents            = var.other_copmonents
+}
+
+
+module "bigquery" {
+  source                     = "./modules/bigquery"
+  stg_bq_dataset             = var.stg_bq_dataset
+  prod_bq_dataset            = var.prod_bq_dataset
+  bq_project_id              = var.projectid
+  bq_region                  = var.project_region
+  contents_destroy_on_delete = var.contents_destroy_on_delete
 }

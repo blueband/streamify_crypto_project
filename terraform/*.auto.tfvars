@@ -31,6 +31,4 @@ other_copmonents     = ["JUPYTER"]
 contents_destroy_on_delete = true
 stg_bq_dataset             = "streamify_stg"
 prod_bq_dataset            = "streamify_prod"
-
-network = "default"
-#
+network = "default
