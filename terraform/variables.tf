@@ -24,10 +24,6 @@ variable "os_image" {
   type        = string
 }
 
-variable "network" {
-  description = "Network for your instance/cluster"
-  type        = string
-}
 
 variable "stg_bq_dataset" {
   description = "Storage class type for your bucket. Check official docs for more info."
