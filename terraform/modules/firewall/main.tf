@@ -1,7 +1,7 @@
 resource "google_compute_firewall" "port_rules" {
   project     = var.project
-  name        = var.kafka_port
-  network     = var.network
+  name        = var.kafka_port_name
+  network     = var.firewall_network
   description = "Opens port 9092 in the Kafka VM for Spark cluster to connect"
 
   allow {

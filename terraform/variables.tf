@@ -121,3 +121,16 @@ variable "other_copmonents" {
 variable "contents_destroy_on_delete" {
   type = bool
 }
+
+variable "wkstation_machine_type" {
+  type = string
+}
+
+variable "project_network" {
+  type = string
+
+}
+
+variable "wkstation_boot_disk_size_gb" {
+  type = number
+}

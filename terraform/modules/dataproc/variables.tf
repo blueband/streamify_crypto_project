@@ -56,3 +56,7 @@ variable "other_copmonents" {
   type = list(any)
 
 }
+
+variable "dataproc_network" {
+  type = string
+}

@@ -1,11 +1,11 @@
 module "firewall" {
   source            = "./modules/firewall"
   project           = var.projectid
-  kafka_port_name   = var.kafka_port_name
-  network           = var.network
+  firewall_network  = var.project_network
   firewall_protocol = var.firewall_protocol
   kafka_port_number = var.kafka_port_number
   ip_range          = var.ip_range
+  kafka_port_name = var.kafka_port_name
 
 }
 
@@ -14,7 +14,7 @@ module "compute" {
   source                      = "./modules/compute"
   kafka_name                  = var.kafka_name
   airflow_name                = var.airflow_name
-  network                     = var.network
+  compute_network             = var.project_network
   wkstation_machine_type      = var.wkstation_machine_type
   wk_stop_update_status       = var.wk_stop_update_status
   os_image                    = var.os_image
@@ -35,7 +35,7 @@ module "dataproc" {
   dataproc_name               = var.dataproc_name
   dataproc_region             = var.project_region
   bucket_name                 = var.bucket_name
-  network                     = var.network
+  dataproc_network            = var.project_network
   data_proc_zone              = var.project_zone
   secure_boot                 = var.secure_boot
   master_num_instance         = var.master_num_instance

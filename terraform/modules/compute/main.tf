@@ -13,7 +13,7 @@ resource "google_compute_instance" "kafka_vm_instance" {
   }
 
   network_interface {
-    network = var.network
+    network = var.compute_network
     access_config {
     }
   }
@@ -34,7 +34,7 @@ resource "google_compute_instance" "airflow_vm_instance" {
   }
 
   network_interface {
-    network = var.network
+    network = var.compute_network
     access_config {
     }
   }
