@@ -5,7 +5,7 @@ module "firewall" {
   firewall_protocol = var.firewall_protocol
   kafka_port_number = var.kafka_port_number
   ip_range          = var.ip_range
-  kafka_port_name = var.kafka_port_name
+  kafka_port_name   = var.kafka_port_name
 
 }
 
